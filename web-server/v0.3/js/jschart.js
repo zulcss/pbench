@@ -722,7 +722,7 @@ function load_plot_files(url, charts_index, index, callback) {
 			prev_packed_index = packed_index;
 			packed_index = text.indexOf(packed_separator, packed_index+1);
 
-			parse_plot_file(charts_index, dataset_index++, text.slice(prev_packed_index + packed_separator.length + 1));
+			parse_plot_file(charts_index, dataset_index++, text.slice(prev_packed_index + packed_separator.length + 1, packed_index));
 		    }
 		}
 
