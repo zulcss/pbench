@@ -1973,7 +1973,6 @@ function generate_chart(stacked, data_model, location, chart_title, x_axis_title
 	.call(charts[charts_index].y.axis.chart);
 
     charts[charts_index].y.axis.title.dom = charts[charts_index].chart.axis.y.chart.append("text")
-	.append("text")
 	.attr("class", "axislabel")
 	.attr("x", -margin.left + 10)
 	.attr("y", -40)
