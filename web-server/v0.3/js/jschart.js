@@ -478,6 +478,12 @@ function parse_plot_file(charts_index, datasets_index, text) {
 	    charts[charts_index].datasets[datasets_index].histogram.p9999 = "No Samples";
 	}
     }
+
+    if (charts[charts_index].options.hide_dataset_threshold &&
+	(charts[charts_index].datasets[i].max_y_value < charts[charts_index].options.hide_dataset_threshold)) {
+	charts[charts_index].datasets[i].hidden = true;
+	charts[charts_index].state.visible_datasets--;
+    }
 }
 
 function update_domains(charts_index) {
@@ -726,6 +732,12 @@ function load_json(charts_index, callback) {
 		    }
 
 		    dataset_index++;
+		}
+
+		if (charts[charts_index].options.hide_dataset_threshold &&
+		    (charts[charts_index].datasets[i].max_y_value < charts[charts_index].options.hide_dataset_threshold)) {
+		    charts[charts_index].datasets[i].hidden = true;
+		    charts[charts_index].state.visible_datasets--;
 		}
 	    }
 
