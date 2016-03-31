@@ -199,9 +199,7 @@ function chart(title, stacked, data_model, x_axis_title, y_axis_title, location,
 			  live_update: { history: null,
 					 interval: null
 				       },
-			  threshold: { max_y: null,
-				       mean: null
-				     }
+			  threshold: null
 			}
 	       };
 
@@ -1114,7 +1112,7 @@ function create_table(charts_index) {
 
     var cell = document.createElement("th");
     cell.colSpan = colspan;
-    cell.innerHTML = "Max Y Threshold: ";
+    cell.innerHTML = "Threshold: ";
 
     var textbox = document.createElement("input");
     textbox.type = "text";
@@ -1123,63 +1121,39 @@ function create_table(charts_index) {
     }
 
     cell.appendChild(textbox);
-    charts[charts_index].dom.table.threshold.max_y = d3.select(textbox);
+    charts[charts_index].dom.table.threshold = d3.select(textbox);
 
     var button = document.createElement("button");
-    button.innerHTML = "Apply";
+    button.innerHTML = "Apply Max Y";
     button.onclick = function() {
-	var value = charts[charts_index].dom.table.threshold.max_y.property("value");
+	var value = charts[charts_index].dom.table.threshold.property("value");
 
 	if (!isNaN(value)) {
 	    charts[charts_index].options.hide_dataset_threshold = value;
 
 	    update_threshold_hidden_datasets(charts_index, "max_y");
-
-	    charts[charts_index].dom.table.threshold.max_y.property("value", charts[charts_index].options.hide_dataset_threshold);
 	} else if (charts[charts_index].options.hide_dataset_threshold) {
-	    charts[charts_index].dom.table.threshold.max_y.property("value", charts[charts_index].options.hide_dataset_threshold);
+	    charts[charts_index].dom.table.threshold.property("value", charts[charts_index].options.hide_dataset_threshold);
 	} else {
-	    charts[charts_index].dom.table.threshold.max_y.property("value", "");
+	    charts[charts_index].dom.table.threshold.property("value", "");
 	}
     };
 
     cell.appendChild(button);
 
-    row.appendChild(cell);
-
-    charts[charts_index].table.table.appendChild(row);
-
-    var row = document.createElement("tr");
-    row.className = "header";
-
-    var cell = document.createElement("th");
-    cell.colSpan = colspan;
-    cell.innerHTML = "Y Average Threshold: ";
-
-    var textbox = document.createElement("input");
-    textbox.type = "text";
-    if (charts[charts_index].options.hide_dataset_threshold) {
-	textbox.value = charts[charts_index].options.hide_dataset_threshold;
-    }
-
-    cell.appendChild(textbox);
-    charts[charts_index].dom.table.threshold.mean = d3.select(textbox);
-
     var button = document.createElement("button");
-    button.innerHTML = "Apply";
+    button.innerHTML = "Apply Y Average";
     button.onclick = function() {
-	var value = charts[charts_index].dom.table.threshold.mean.property("value");
+	var value = charts[charts_index].dom.table.threshold.property("value");
 
 	if (!isNaN(value)) {
 	    charts[charts_index].options.hide_dataset_threshold = value;
 
 	    update_threshold_hidden_datasets(charts_index, "mean");
-
-	    charts[charts_index].dom.table.threshold.max_y.property("value", charts[charts_index].options.hide_dataset_threshold);
 	} else if (charts[charts_index].options.hide_dataset_threshold) {
-	    charts[charts_index].dom.table.threshold.mean.property("value", charts[charts_index].options.hide_dataset_threshold);
+	    charts[charts_index].dom.table.threshold.property("value", charts[charts_index].options.hide_dataset_threshold);
 	} else {
-	    charts[charts_index].dom.table.threshold.mean.property("value", "");
+	    charts[charts_index].dom.table.threshold.property("value", "");
 	}
     };
 
