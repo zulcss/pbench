@@ -2669,7 +2669,7 @@ function dehighlight(charts_index, datasets_index) {
 		.style("stroke-width", "1.5px");
 
 	    if (charts[charts_index].datasets[i].dom.points) {
-		charts[charts_index].datasets[i].dom.points.style("opacity", unhighlighted_opacity)
+		charts[charts_index].datasets[i].dom.points.style("opacity", default_opacity)
 		    .attr("r", 3);
 	    }
 	}
