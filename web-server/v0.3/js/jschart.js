@@ -1106,7 +1106,7 @@ function create_table(charts_index) {
 
     charts[charts_index].dom.table.threshold = cell.append("input")
 	.attr("type", "text")
-	.text(function() {
+	.property("value", function() {
 	    if (charts[charts_index].options.hide_dataset_threshold) {
 		return charts[charts_index].options.hide_dataset_threshold;
 	    }
@@ -1156,7 +1156,7 @@ function create_table(charts_index) {
 
 	charts[charts_index].dom.table.live_update.history = cell.append("input")
 	    .attr("type", "text")
-	    .text(function() {
+	    .property("value", function() {
 		if (charts[charts_index].options.history_length) {
 		    return charts[charts_index].options.history_length;
 		}
@@ -1182,7 +1182,7 @@ function create_table(charts_index) {
 
 	charts[charts_index].dom.table.live_update.interval = cell.append("input")
 	    .attr("type", "text")
-	    .text(function() {
+	    .property("value", function() {
 		if (charts[charts_index].options.update_interval) {
 		    return charts[charts_index].options.update_interval;
 		}
