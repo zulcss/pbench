@@ -62,7 +62,7 @@ test -d $INCOMING || doexit "Bad INCOMING=$INCOMING"
 # make sure only one copy is running.
 # Use 'flock -n $LOCKFILE /home/pbench/bin/pbench-unpack-tarballs' in the
 # crontab to ensure that only one copy is running. The script itself
-# does not use any locking. 
+# does not use any locking.
 
 # the link source and destination for this script
 linksrc=TO-COPY-SOS
@@ -78,7 +78,7 @@ fi
 echo "$TS: starting at $(timestamp)"
 
 # get the list of files we'll be operating on
-list=$(ls $ARCHIVE/*/$linksrc/*.tar.xz 2>/dev/null)
+list=$(ls $ARCHIVE/hostnames/*/$linksrc/*.tar.xz 2>/dev/null)
 
 typeset -i nresults=0
 typeset -i ntotal=0
@@ -88,11 +88,6 @@ TMPDIR=$TMP/pbench-copy-sosreports.$$
 trap "rm -rf $TMPDIR" EXIT INT QUIT
 mkdir -p $TMPDIR || exit 1
 
-index_content=$TMPDIR/index_mail_contents
-
-# Initialize index mail content
-> $index_content
-
 for result in $list ;do
     link=$(readlink -e $result)
     if [ ! -f $link ] ;then
@@ -100,10 +95,10 @@ for result in $list ;do
         nerrs=$nerrs+1
         continue
     fi
-       
+
     resultname=$(basename $result)
     resultname=${resultname%.tar.xz}
-    hostname=$(basename $(dirname $link))
+    hostname=$(echo $(basename $(dirname $(dirname $result))))
 
     # echo $link
     # echo $resultname
@@ -116,7 +111,7 @@ for result in $list ;do
     # the tarball is already unpacked, so go to the appropriate place
     # and find all the sosreports under it. This should be quick!
 
-    incoming=$INCOMING/$hostname/$resultname
+    incoming=$INCOMING/hostnames/$hostname/$resultname
 
     typeset -i nsr=0
     # we look in a few places for the sysinfo/ dir, because we support
@@ -166,7 +161,7 @@ for result in $list ;do
         fi
         popd > /dev/null
     fi
-    
+
     # move the link to $linkdest directory
     mv $result $(echo $result | sed "s/$linksrc/$linkdest/")
     sts=$?
@@ -194,7 +189,7 @@ if [[ $ntotal -gt 0 || $nerrs -gt 0 ]]; then
     fi
     # don't send mail when running unittests
     if [[ "$_PBENCH_SERVER_TEST" != 1 ]] ;then
-        cat << EOF > $index_content
+	cat << EOF > $index_content
 $subj
 Processed $ntotal sosreports for $nresults results directories with $nerrs errors
 EOF
