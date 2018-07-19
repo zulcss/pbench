@@ -5,10 +5,47 @@
 /var/tmp/pbench-test-server/pbench/archive
 /var/tmp/pbench-test-server/pbench/archive/duplicates
 /var/tmp/pbench-test-server/pbench/archive/fs-version-001
-/var/tmp/pbench-test-server/pbench/archive/fs-version-001/Controller
-/var/tmp/pbench-test-server/pbench/archive/fs-version-001/Controller/TODO
-/var/tmp/pbench-test-server/pbench/archive/fs-version-001/Controller/pbench-user-benchmark_ndk-test-1_2018.05.23T03.21.32.tar.xz
-/var/tmp/pbench-test-server/pbench/archive/fs-version-001/Controller/pbench-user-benchmark_ndk-test-1_2018.05.23T03.21.32.tar.xz.md5
+/var/tmp/pbench-test-server/pbench/archive/fs-version-001/5a
+/var/tmp/pbench-test-server/pbench/archive/fs-version-001/5a/5e
+/var/tmp/pbench-test-server/pbench/archive/fs-version-001/5a/5e/2903f2a39048ef3d3ec59b9b913c
+/var/tmp/pbench-test-server/pbench/archive/fs-version-001/5a/5e/2903f2a39048ef3d3ec59b9b913c/pbench-user-benchmark_ndk-test-1_2018.05.23T03.21.32.tar.xz
+/var/tmp/pbench-test-server/pbench/archive/fs-version-001/5a/5e/2903f2a39048ef3d3ec59b9b913c/pbench-user-benchmark_ndk-test-1_2018.05.23T03.21.32.tar.xz.hostname
+/var/tmp/pbench-test-server/pbench/archive/fs-version-001/5a/5e/2903f2a39048ef3d3ec59b9b913c/pbench-user-benchmark_ndk-test-1_2018.05.23T03.21.32.tar.xz.md5
+/var/tmp/pbench-test-server/pbench/archive/fs-version-001/hostnames
+/var/tmp/pbench-test-server/pbench/archive/fs-version-001/hostnames/Controller
+/var/tmp/pbench-test-server/pbench/archive/fs-version-002
+/var/tmp/pbench-test-server/pbench/archive/fs-version-002/hostnames
+/var/tmp/pbench-test-server/pbench/archive/fs-version-002/hostnames/Controller
+/var/tmp/pbench-test-server/pbench/archive/fs-version-002/hostnames/Controller/BAD-MD5
+/var/tmp/pbench-test-server/pbench/archive/fs-version-002/hostnames/Controller/DONE
+/var/tmp/pbench-test-server/pbench/archive/fs-version-002/hostnames/Controller/INDEXED
+/var/tmp/pbench-test-server/pbench/archive/fs-version-002/hostnames/Controller/MOVED-UNPACKED
+/var/tmp/pbench-test-server/pbench/archive/fs-version-002/hostnames/Controller/SATELLITE-DONE
+/var/tmp/pbench-test-server/pbench/archive/fs-version-002/hostnames/Controller/SATELLITE-MD5-FAILED
+/var/tmp/pbench-test-server/pbench/archive/fs-version-002/hostnames/Controller/SATELLITE-MD5-PASSED
+/var/tmp/pbench-test-server/pbench/archive/fs-version-002/hostnames/Controller/SYNCED
+/var/tmp/pbench-test-server/pbench/archive/fs-version-002/hostnames/Controller/TO-BACKUP
+/var/tmp/pbench-test-server/pbench/archive/fs-version-002/hostnames/Controller/TO-COPY-SOS
+/var/tmp/pbench-test-server/pbench/archive/fs-version-002/hostnames/Controller/TO-DELETE
+/var/tmp/pbench-test-server/pbench/archive/fs-version-002/hostnames/Controller/TO-INDEX
+/var/tmp/pbench-test-server/pbench/archive/fs-version-002/hostnames/Controller/TO-LINK
+/var/tmp/pbench-test-server/pbench/archive/fs-version-002/hostnames/Controller/TO-SYNC
+/var/tmp/pbench-test-server/pbench/archive/fs-version-002/hostnames/Controller/TO-UNPACK
+/var/tmp/pbench-test-server/pbench/archive/fs-version-002/hostnames/Controller/TODO
+/var/tmp/pbench-test-server/pbench/archive/fs-version-002/hostnames/Controller/UNPACKED
+/var/tmp/pbench-test-server/pbench/archive/fs-version-002/hostnames/Controller/WONT-INDEX
+/var/tmp/pbench-test-server/pbench/archive/fs-version-002/hostnames/Controller/WONT-INDEX.1
+/var/tmp/pbench-test-server/pbench/archive/fs-version-002/hostnames/Controller/WONT-INDEX.10
+/var/tmp/pbench-test-server/pbench/archive/fs-version-002/hostnames/Controller/WONT-INDEX.11
+/var/tmp/pbench-test-server/pbench/archive/fs-version-002/hostnames/Controller/WONT-INDEX.12
+/var/tmp/pbench-test-server/pbench/archive/fs-version-002/hostnames/Controller/WONT-INDEX.2
+/var/tmp/pbench-test-server/pbench/archive/fs-version-002/hostnames/Controller/WONT-INDEX.3
+/var/tmp/pbench-test-server/pbench/archive/fs-version-002/hostnames/Controller/WONT-INDEX.4
+/var/tmp/pbench-test-server/pbench/archive/fs-version-002/hostnames/Controller/WONT-INDEX.5
+/var/tmp/pbench-test-server/pbench/archive/fs-version-002/hostnames/Controller/WONT-INDEX.6
+/var/tmp/pbench-test-server/pbench/archive/fs-version-002/hostnames/Controller/WONT-INDEX.7
+/var/tmp/pbench-test-server/pbench/archive/fs-version-002/hostnames/Controller/WONT-INDEX.8
+/var/tmp/pbench-test-server/pbench/archive/fs-version-002/hostnames/Controller/WONT-INDEX.9
 /var/tmp/pbench-test-server/pbench/archive/quarantine
 /var/tmp/pbench-test-server/pbench/logs
 /var/tmp/pbench-test-server/pbench/logs/pbench-server-prep-shim-002
@@ -29,13 +66,12 @@
 +++ pbench log file contents
 /var/tmp/pbench-test-server/pbench/logs/pbench-server-prep-shim-002/pbench-server-prep-shim-002.log:run-1900-01-01T00:00:00-UTC
 /var/tmp/pbench-test-server/pbench/logs/pbench-server-prep-shim-002/pbench-server-prep-shim-002.log:pbench-user-benchmark_ndk-test-1_2018.05.23T03.21.32.tar.xz: OK
-/var/tmp/pbench-test-server/pbench/logs/pbench-server-prep-shim-002/pbench-server-prep-shim-002.log:run-1900-01-01T00:00:00-UTC: Processed 1 entries, 1 tarballs successful, 0 quarantined tarballs, 0 duplicately-named tarballs, 0 errors.
+/var/tmp/pbench-test-server/pbench/logs/pbench-server-prep-shim-002/pbench-server-prep-shim-002.log:run-1900-01-01T00:00:00-UTC: Processed 1 entries, 1 tarballs successful,    0 quarantined tarballs, 0 duplicately-named tarballs,    0 errors.
 --- pbench log file contents
 +++ test-execution.log file contents
-/var/tmp/pbench-test-server/test-execution.log:/var/tmp/pbench-test-server/opt/pbench-server/unittest-scripts/ln -s /var/tmp/pbench-test-server/pbench/archive/fs-version-001/Controller/pbench-user-benchmark_ndk-test-1_2018.05.23T03.21.32.tar.xz .
-/var/tmp/pbench-test-server/test-execution.log:/var/tmp/pbench-test-server/opt/pbench-server/unittest-scripts/pbench-report-status --name pbench-server-prep-shim-002 --timestamp run-1900-01-01T00:00:00-UTC --type status /var/tmp/pbench-test-server/pbench/tmp/pbench-server-prep-shim-002.NNNN/status
+/var/tmp/pbench-test-server/test-execution.log:/var/tmp/pbench-test-server/opt/pbench-server/unittest-scripts/pbench-report-status --name pbench-server-prep-shim-002 --timestamp run-1900-01-01T00:00:00-UTC --type status /var/tmp/pbench-test-server/pbench/tmp/pbench-server-prep-shim-002.NNNN/index_mail_contents
 --- test-execution.log file contents
 +++ test-report-status.log file contents
 /var/tmp/pbench-test-server/test-report-status.log:run-1900-01-01T00:00:00-UTC: processed /var/tmp/pbench-test-server/pbench-local/fs-version-002/pbench-move-results-receive/Controller/pbench-user-benchmark_ndk-test-1_2018.05.23T03.21.32.tar.xz
-/var/tmp/pbench-test-server/test-report-status.log:run-1900-01-01T00:00:00-UTC: Processed 1 entries, 1 tarballs successful, 0 quarantined tarballs, 0 duplicately-named tarballs, 0 errors.
+/var/tmp/pbench-test-server/test-report-status.log:run-1900-01-01T00:00:00-UTC: Processed 1 entries, 1 tarballs successful,    0 quarantined tarballs, 0 duplicately-named tarballs,    0 errors.
 --- test-report-status.log file contents
