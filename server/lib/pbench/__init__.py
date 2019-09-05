@@ -153,7 +153,8 @@ def get_pbench_logger(caller, config):
         except FileExistsError:
             # directory already exists, ignore
             pass
-        fh = logging.FileHandler(os.path.join(logdir, "{}.log".format(caller)))
+        #fh = logging.FileHandler(os.path.join(logdir, "{}.log".format(caller)))
+        fh = SysLogHandler(address=('localhost', 514), facility=19, socktype = socket.SOCK_STREAM)
         fh.setLevel(logging.DEBUG)
         if not config._unittests:
             logfmt = "{asctime} {levelname} {process} {thread} {name}.{module} {funcName} {lineno} -- {message}"
