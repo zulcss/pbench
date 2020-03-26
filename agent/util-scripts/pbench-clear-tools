@@ -24,10 +24,10 @@ if [ $? -ne 0 ]; then
 	printf "\n"
 	printf "$script_name: you specified an invalid option\n\n"
 	printf "The following are required:\n\n"
-	printf -- "\t-g str --group=str, str = the group from which tools should be removed\n"
+	printf -- "\t   -g str --group=str, str = the group from which tools should be removed\n"
 	printf -- "\t                          (the default group is 'default')\n"
-	printf -- "\t-n str --name=str, str = a specific tool to be removed.  If no tool is specified, all tools in the group are removed\n"
-        printf -- "\t-n str --remote=str, str = a specific remote on which tools needs to be cleared.  If no remote is specified, all the tools are removed\n"
+	printf -- "\t   -n str --name=str, str = a specific tool to be removed.  If no tool is specified, all tools in the group are removed\n"
+    printf -- "\t   -r str --remote=str, str = a specific remote on which tools needs to be cleared.  If no remote is specified, all the tools are removed\n"
 	printf "\n"
 
 	exit 1
