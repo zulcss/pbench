@@ -2,6 +2,7 @@
 skip-string-normalization = false
 exclude = '''
 (
-fio-histo-log-pctiles.py
+fio-histo-log-pctiles.py |
+agent/stockpile
 )
 '''
