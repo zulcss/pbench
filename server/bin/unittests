@@ -256,8 +256,6 @@ function _setup_state {
     let res=res+$?
     cp -a $_tdir/{unittests,getconf.py,pbench*} $_testopt_sat/bin
     let res=res+$?
-    cp -a $_tdir/../../lib/* $_testopt/common/lib
-    let res=res+$?
     cp -a $_tdir/../lib $_testopt
     let res=res+$?
     cp -a $_tdir/../lib $_testopt_sat
