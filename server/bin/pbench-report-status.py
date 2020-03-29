@@ -1,18 +1,22 @@
 #!/usr/bin/env python3
 # -*- mode: python -*-
 
+import os
 import sys
+from argparse import ArgumentParser
+from socket import gethostname
+
+from pbench import BadConfig, PbenchConfig
+from pbench.report import Report
 
 if __name__ != "__main__":
     sys.exit(1)
 
-import os
 
 _prog = os.path.basename(sys.argv[0])
 if _prog.endswith(".py"):
     _prog = _prog[:-3]
 
-from argparse import ArgumentParser
 
 parser = ArgumentParser(_prog)
 parser.add_argument("-C", "--config", dest="cfg_name", help="Specify config file")
@@ -59,7 +63,6 @@ parser.add_argument(
 )
 parsed = parser.parse_args()
 
-from pbench import PbenchConfig, BadConfig
 
 try:
     config = PbenchConfig(parsed.cfg_name)
@@ -67,8 +70,6 @@ except BadConfig as e:
     print("{}: {}".format(_prog, e), file=sys.stderr)
     sys.exit(1)
 
-from pbench.report import Report
-from socket import gethostname
 
 hostname = gethostname()
 pid = parsed.pid
