@@ -8,25 +8,32 @@ from pbench.common import exception
 
 
 class AgentConfig:
-    def __init__(self):
-        cfg_name = self._get_agent_default_conf()
-        config_files = configtools.file_list(cfg_name)
+    def __init__(self, cfg_name=None):
+        self.cfg_name = self._get_agent_default_conf(cfg_name)
+        config_files = configtools.file_list(self.cfg_name)
         config_files.reverse()
         self.conf = configparser.ConfigParser()
         self.files = self.conf.read(config_files)
 
-    def _get_agent_default_conf(self):
+    def _get_agent_default_conf(self, cfg_name):
         """Get the default config directory of pbench-agent
 
         :return: default pbench agent config
         """
-        pbench_cfg = os.environ.get("_PBENCH_AGENT_CONFIG", None)
-        if pbench_cfg:
-            path = pathlib.Path(pbench_cfg)
+        if cfg_name:
+            path = pathlib.Path(cfg_name)
             if not path.exists():
-                raise exception.MissingConfig("Config not found: {}".format(pbench_cfg))
+                raise exception.MissingConfig("Config not found: {}".format(cfg_name))
         else:
-            raise exception.BrokenConfig("PBENCH_AGENT_CONFIG is not")
+            pbench_cfg = os.environ.get("_PBENCH_AGENT_CONFIG", None)
+            if pbench_cfg:
+                path = pathlib.Path(pbench_cfg)
+                if not path.exists():
+                    raise exception.MissingConfig(
+                        "Config not found: {}".format(pbench_cfg)
+                    )
+            else:
+                raise exception.BrokenConfig("PBENCH_AGENT_CONFIG is not")
 
         return str(path)
 
