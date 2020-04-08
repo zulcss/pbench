@@ -1,7 +1,11 @@
 import click
 
+from pbench.agent.modules import cleanup
 from pbench.agent.modules import config
 
+@click.command()
+def pbench_cleanup():
+    cleanup.PbenchCleanup().cleanup()
 
 @click.command()
 @click.argument("cfg_file")
