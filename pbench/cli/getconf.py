@@ -3,7 +3,7 @@
 import sys
 from pbench.common import configtools
 
-if __name__ == "__main__":
+def main():
     opts, args = configtools.parse_args(
         configtools.options,
         usage="Usage: getconf.py [options] <item>|-a <section> [<section> ...]",
@@ -11,3 +11,6 @@ if __name__ == "__main__":
     conf, files = configtools.init(opts, "_PBENCH_AGENT_CONFIG")
     status = configtools.main(conf, args, opts, files)
     sys.exit(status)
+
+if __name__ == "__main__":
+    main()
