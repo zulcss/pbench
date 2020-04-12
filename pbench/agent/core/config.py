@@ -10,8 +10,8 @@ class AgentConfig(object):
     def __init__(self, config_file=None):
         self.config_file = config_file
         if not self.config_file:
-            self.config = self._get_agent_config()
-        config_files = configtools.file_list(self.config)
+            self.config_file = self._get_agent_config()
+        config_files = configtools.file_list(self.config_file)
         config_files.reverse()
         self.conf = configparser.ConfigParser()
         self.files = self.conf.read(config_files)
@@ -39,7 +39,13 @@ class AgentConfig(object):
                 print(e)
                 sysexit(2)
         else:
-            raise Exception("PBENCH_AGENT_CONFIG is not set")
+            path = pathlib.Path(pbench_cfg)
+            if not path.exists():
+                raise Exception("PBENCH_AGENT_CONFIG is not set")
+            if not path.is_file():
+                raise Exception(
+                    "Not a valid configuration file: " "{}".format(pbench_cfg)
+                )
 
         return normalize_path(path)
 
@@ -52,7 +58,7 @@ class AgentConfig(object):
                     "The provided pbench run directory: {}, "
                     "does not exist".format(path)
                 )
-                sysexit(1)
+
             return path
         except configparser.Error:
             return "/var/lib/pbench-agent"

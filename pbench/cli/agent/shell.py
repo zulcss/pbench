@@ -1,10 +1,11 @@
 import click
 
+from pbench.cli.agent.commands import config
 
-@click.command()
+
+@click.group()
 def main():
-    print("test")
+    pass
 
 
-if __name__ == "__main__":
-    main()
+main.add_command(config.config)

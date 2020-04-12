@@ -1,10 +1,4 @@
-import subprocess
-
-
-def capture(command):
-    proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE,)
-    out, err = proc.communicate()
-    return out, err, proc.returncode
+from pbench.test.cli.common import capture
 
 
 def test_pbench_config():
