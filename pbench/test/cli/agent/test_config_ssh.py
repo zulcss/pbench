@@ -1,8 +1,8 @@
 from pbench.test.cli.common import capture
 
 
-def test_pbench_agent_config_activate(monkeypatch, tmpdir):
-    command = ["pbench-agent-config-activate", "--help"]
+def test_pbench_agent_config_ssh_key(monkeypatch, tmpdir):
+    command = ["pbench-agent-config-ssh-key", "--help"]
     out, err, exitcode = capture(command)
     assert b"--help" in out
     assert exitcode == 0
@@ -17,17 +17,19 @@ def test_pbench_agent_config_activate(monkeypatch, tmpdir):
         str(pbench_install_dir)
     )
     cfg.write(config)
-    command = ["pbench-agent-config-activate", str(cfg)]
+    pbench_ssh_key = tmpdir / "ssh-key"
+    pbench_ssh_key.write("")
+    command = ["pbench-agent-config-ssh-key", str(cfg), str(pbench_ssh_key)]
     out, err, exitcode = capture(command)
-    pbench_result = pbench_install_dir / "config"
+    assert exitcode == 0
+    pbench_result = pbench_install_dir / "id_rsa"
     assert pbench_result.exists()
-    pbench_cfg = pbench_result / "pbench-agent.cfg"
-    assert pbench_cfg.exists()
 
 
-def test_pbench_config_activate(monkeypatch, tmpdir):
-    command = ["pbench", "config", "activate", "--help"]
+def test_pbench_config_ssh(monkeypatch, tmpdir):
+    command = ["pbench", "config", "ssh", "--help"]
     out, err, exitcode = capture(command)
+    assert b"--help" in out
     assert exitcode == 0
 
     cfg = tmpdir / "pbench-agent.cfg"
@@ -40,9 +42,10 @@ def test_pbench_config_activate(monkeypatch, tmpdir):
         str(pbench_install_dir)
     )
     cfg.write(config)
-    command = ["pbench", "config", "activate", str(cfg)]
+    pbench_ssh_key = tmpdir / "ssh-key"
+    pbench_ssh_key.write("")
+    command = ["pbench", "config", "ssh", str(cfg), str(pbench_ssh_key)]
     out, err, exitcode = capture(command)
-    pbench_result = pbench_install_dir / "config"
+    assert exitcode == 0
+    pbench_result = pbench_install_dir / "id_rsa"
     assert pbench_result.exists()
-    pbench_cfg = pbench_result / "pbench-agent.cfg"
-    assert pbench_cfg.exists()
