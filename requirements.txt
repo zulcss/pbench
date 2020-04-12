@@ -4,3 +4,4 @@ sh
 boto3
 click
 colorlog
+plumbum
