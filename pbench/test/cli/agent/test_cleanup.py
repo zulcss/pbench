@@ -40,7 +40,6 @@ def test_pbench_cleanup(monkeypatch, tmpdir):
 
     command = ["pbench-cleanup"]
     out, err, exitcode = capture(command)
-    print(err)
     pbench_result = pathlib.Path(install_dir)
     assert len([p for p in pbench_result.iterdir()]) == 0
 
@@ -60,3 +59,35 @@ def test_cli_pbench_cleanup(monkeypatch, tmpdir):
     out, err, exitcode = capture(command)
     pbench_result = pathlib.Path(install_dir)
     assert len([p for p in pbench_result.iterdir()]) == 0
+
+
+def test_pbench_clear_results(monkeypatch, tmpdir):
+    command = ["pbench-clear-results", "--help"]
+    out, err, exitcode = capture(command)
+    assert b"--help" in out
+    assert exitcode == 0
+
+    pbench_install_dir = tmpdir / "pbench-agent"
+    pbench_install_dir.mkdir()
+    run_dir = pbench_run_config(monkeypatch, tmpdir, pbench_install_dir)
+    stub_pbench_run_dir(tmpdir, run_dir)
+
+    command = ["pbench-clear-results"]
+    out, err, exitcode = capture(command)
+    assert exitcode == 0
+
+
+def test_cli_pbench_cleanup_results(monkeypatch, tmpdir):
+    command = ["pbench", "cleanup", "results", "--help"]
+    out, err, exitcode = capture(command)
+    assert b"--help" in out
+    assert exitcode == 0
+
+    pbench_install_dir = tmpdir / "pbench-agent"
+    pbench_install_dir.mkdir()
+    run_dir = pbench_run_config(monkeypatch, tmpdir, pbench_install_dir)
+    stub_pbench_run_dir(tmpdir, run_dir)
+
+    command = ["pbench", "cleanup", "results"]
+    out, err, exitcode = capture(command)
+    assert exitcode == 0
