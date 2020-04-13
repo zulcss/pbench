@@ -91,3 +91,51 @@ def test_cli_pbench_cleanup_results(monkeypatch, tmpdir):
     command = ["pbench", "cleanup", "results"]
     out, err, exitcode = capture(command)
     assert exitcode == 0
+
+
+def test_pbench_clear_tools(monkeypatch, tmpdir):
+    command = ["pbench-clear-tools", "--help"]
+    out, err, exitcode = capture(command)
+    assert b"--help" in out
+    assert exitcode == 0
+
+    pbench_install_dir = tmpdir / "pbench-agent"
+    pbench_install_dir.mkdir()
+
+    run_dir = pbench_run_config(monkeypatch, tmpdir, pbench_install_dir)
+    stub_pbench_run_dir(tmpdir, run_dir)
+    pbench_fake_group = run_dir / "fake-group"
+    pbench_fake_group.mkdir()
+    pbench_fake_tool = run_dir / "ocp"
+    pbench_fake_tool.write("")
+
+    command = ["pbench-clear-tools"]
+    out, err, exitcode = capture(command)
+    assert exitcode == 0
+
+    pbench_result = run_dir / "tools-default" / "ocp"
+    assert pbench_result.exists() is False
+
+
+def test_pbench_cli_clear_tools(monkeypatch, tmpdir):
+    command = ["pbench", "cleanup", "tools", "--help"]
+    out, err, exitcode = capture(command)
+    assert b"--help" in out
+    assert exitcode == 0
+
+    pbench_install_dir = tmpdir / "pbench-agent"
+    pbench_install_dir.mkdir()
+
+    run_dir = pbench_run_config(monkeypatch, tmpdir, pbench_install_dir)
+    stub_pbench_run_dir(tmpdir, run_dir)
+    pbench_fake_group = run_dir / "fake-group"
+    pbench_fake_group.mkdir()
+    pbench_fake_tool = run_dir / "ocp"
+    pbench_fake_tool.write("")
+
+    command = ["pbench", "cleanup", "tools"]
+    out, err, exitcode = capture(command)
+    assert exitcode == 0
+
+    pbench_result = run_dir / "tools-default" / "ocp"
+    assert pbench_result.exists() is False

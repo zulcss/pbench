@@ -1,4 +1,5 @@
 import pathlib
+import sys
 
 from plumbum import local
 from plumbum.path.utils import delete
@@ -31,3 +32,26 @@ class PbenchClearResults(base.Base):
                         file.unlink()
                     if file.is_dir():
                         file.rmdir()
+
+
+class PbenchClearTools(base.Base):
+    def execute(self):
+        pbench_run_dir = pathlib.Path(AgentConfig().get_pbench_run())
+        if not pbench_run_dir.exists():
+            sys.exit(1)
+
+        group = self.command_args.get("group", None)
+        tool = self.command_args.get("tool", None)
+
+        regex = "tools-"
+        if group:
+            regex = regex + group + "/*"
+        else:
+            regex = regex + "default/*"
+
+        if tool is None:
+            tool = "*"
+
+        for file in pbench_run_dir.rglob(regex):
+            if file.match(tool) and file.is_file():
+                file.unlink()
