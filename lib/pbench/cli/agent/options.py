@@ -47,13 +47,13 @@ def _pbench_agent_config(f):
 def _pbench_agent_debug(f):
     def callback(ctx, param, value):
         clictx = ctx.ensure_object(context.CliContext)
-        clictx.config = value
+        clictx.debug = value
         return value
 
     return click.option(
         "--debug",
-        is_action=True,
+        is_flag=True,
         expose_value=False,
         callback=callback,
         help="Turn on debugging",
-    )
+    )(f)

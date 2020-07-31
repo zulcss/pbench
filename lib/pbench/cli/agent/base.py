@@ -17,6 +17,7 @@ class Base(metaclass=abc.ABCMeta):
 
         self.context = context
         self.config = self.context.config
+        self.debug = self.context.debug
 
         # very first thing to do is figure out which pbench we are
         self.pbench_run = Path(os.environ.get("pbench_run", self.config.pbench_run))
