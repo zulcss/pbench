@@ -2,6 +2,8 @@ import click
 import click_completion
 import pbr.version
 
+from pbench.cli.agent.commands import cleanup
+
 click_completion.init()
 
 
@@ -18,3 +20,6 @@ def main(ctxt):
      eval "$(_PBENCH_COMPLETE=source pbench)"
     """
     pass
+
+
+main.add_command(cleanup.cleanup)

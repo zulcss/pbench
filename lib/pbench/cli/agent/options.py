@@ -1,3 +1,6 @@
+import os
+import sys
+
 import click
 
 from pbench.cli.agent import context
@@ -15,9 +18,14 @@ def _pbench_agent_config(f):
     def callback(ctx, param, value):
         clictx = ctx.ensure_object(context.CliContext)
         try:
+            if value is None or not os.path.exists(value):
+                click.secho(f"Configuration file is not found: {value}", err="Red")
+                sys.exit(1)
+
             clictx.config = PbenchAgentConfig(value)
         except Exception as ex:
-            click.secho(f"Failed to load {value}: {ex}")
+            click.secho(f"Failed to load {value}: {ex}", err="red")
+            sys.exit(1)
         return value
 
     return click.option(
