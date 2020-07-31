@@ -14,3 +14,5 @@ python-daemon
 bottle
 pbr
 click_completion
+colorlog
+colorama
