@@ -9,6 +9,7 @@ from pbench.agent import PbenchAgentConfig
 
 def common_options(f):
     f = _pbench_agent_config(f)
+    f = _pbench_agent_debug(f)
     return f
 
 
@@ -41,3 +42,18 @@ def _pbench_agent_config(f):
             "'_PBENCH_AGENT_CONFIG' envrionment variable."
         ),
     )(f)
+
+
+def _pbench_agent_debug(f):
+    def callback(ctx, param, value):
+        clictx = ctx.ensure_object(context.CliContext)
+        clictx.config = value
+        return value
+
+    return click.option(
+        "--debug",
+        is_action=True,
+        expose_value=False,
+        callback=callback,
+        help="Turn on debugging",
+    )
