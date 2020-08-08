@@ -13,14 +13,13 @@ import click
 import redis
 
 from pbench.cli.agent import base, context, options
+from pbench.agent.common import redis_port, channel
 
 # FIXME: move to common area
 redis_host = "localhost"
-# Port number is "One Tool" in hex 0x17001
-redis_port = 17001
+
 
 # FIXME: this should be moved to a shared area
-tm_channel = "tool-meister-chan"
 cl_channel = "tool-meister-client"
 
 # List of allowed operations
@@ -159,19 +158,19 @@ class Client(base.Base):
         #   }
         # The caller of tool-meister-client must be sure the directory argument
         # is accessible by the tool-data-sink.
-        logger.debug("publish %s", tm_channel)
+        logger.debug("publish %s", channel)
         msg = dict(
             state=self.context.operation,
             group=self.context.group,
             directory=self.context.directory,
         )
         try:
-            num_present = redis_server.publish(tm_channel, json.dumps(msg))
+            num_present = redis_server.publish(channel, json.dumps(msg))
         except Exception:
             logger.exception("Failed to publish client message")
             ret_val = 1
         else:
-            logger.debug("published %s", tm_channel)
+            logger.debug("published %s", channel)
             if num_present != expected_pids:
                 logger.error(
                     "Failed to publish to %d pids, only encountered %d on the channel",

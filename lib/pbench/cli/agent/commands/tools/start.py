@@ -28,11 +28,8 @@ import click
 import redis
 
 from pbench.agent.tools import ToolGroup
+from pbench.agent.common import channel, redis_port
 from pbench.cli.agent import base, context, options
-
-# Port number is "One Tool" in hex 0x17001
-# FIXME: move to common area
-redis_port = 17001
 
 # Redis server configuration template for pbench's use
 redis_conf_tmpl = """bind {hostnames}
@@ -44,9 +41,6 @@ loglevel notice
 pidfile {tm_dir}/redis_{redis_port:d}.pid
 port {redis_port:d}
 """
-
-# FIXME: this should be moved to a shared area
-channel = "tool-meister-chan"
 
 # Maximum time to wait for the Redis server to respond.
 REDIS_MAX_WAIT = 60

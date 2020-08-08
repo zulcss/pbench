@@ -16,12 +16,7 @@ import click
 
 import redis
 from pbench.cli.agent import base, context, options
-
-# port number is "One Tool" in hex 0x17001
-# FIXME: move to common area
-redis_port = 17001
-# FIXME: this should be moved to a shared area
-channel = "tool-meister-chan"
+from pbench.agent.common import channel, redis_port
 
 
 def is_running(pid):
