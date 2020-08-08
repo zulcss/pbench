@@ -1,5 +1,7 @@
+import abc
 import datetime
 import os
+from pathlib import Path
 import socket
 import sys
 
@@ -7,7 +9,7 @@ import sys
 import click
 
 
-class Base:
+class Base(metaclass=abc.ABCMeta):
     """An base class used to define the command interface."""
 
     def __init__(self, context):
@@ -17,10 +19,8 @@ class Base:
         self.config = self.context.config
 
         # very first thing to do is figure out which pbench we are
-        if self.config.pbench_run.exists():
-            self.pbench_run = self.config.pbench_run
-            os.environ["pbench_run"] = str(self.pbench_run)
-        else:
+        self.pbench_run = Path(os.environ.get("pbench_run", self.config.pbench_run))
+        if not self.pbench_run.exists():
             click.secho(
                 f"[ERROR] the provided pbench run directory, {self.pbench_run}, does not exist",
                 err="red",
@@ -29,31 +29,29 @@ class Base:
 
         # the pbench temporary directory is always relative to the $pbench_run
         # directory
-        self.pbench_tmp = self.config.pbench_tmp
+        self.pbench_tmp = Path(os.environ.get("pbench_tmp", self.config.pbench_tmp))
         self.pbench_tmp.mkdir(parents=True, exist_ok=True)
         if not self.pbench_tmp.exists():
             click.secho(
                 f"[ERROR] unable to create TMP dir, {self.pbench_tmp}", err="red"
             )
             sys.exit(1)
-        os.environ["pbench_tmp"] = str(self.pbench_tmp)
-
-        self.pbench_log = self.config.pbench_log
-        os.environ["pbench_log"] = str(self.pbench_log)
-
-        self.pbench_install_dir = self.config.pbench_install_dir
+        self.pbench_log = Path(os.environ.get("pbench_log", self.config.pbench_log))
+        self.pbench_install_dir = Path(
+            os.environ.get("pbench_install_dir", self.config.pbench_install_dir)
+        )
         if not self.pbench_install_dir.exists():
             click.secho(
                 f"[ERROR] pbench installation directory, {self.pbench_install_dir}, does not exist",
                 err="red",
             )
             sys.exit(1)
-        os.environ["pbench_install_dir"] = str(self.pbench_install_dir)
-
-        self.pbench_bspp_dir = self.pbench_install_dir / "bench-scripts/postprocess"
-        os.environ["pbench_pbspp_dir"] = str(self.pbench_bspp_dir)
-        self.pbench_lib_dir = self.config.pbench_lib_dir
-        os.environ["pbench_lib_dir"] = str(self.pbench_lib_dir)
+        self.pbench_bspp_dir = os.environ.get(
+            "pbench_bspp_dir", (self.pbench_install_dir / "bench-scripts/postprocess")
+        )
+        self.pbench_lib_dir = Path(
+            os.environ.get("pbench_lib_dir", self.config.pbench_lib_dir)
+        )
 
         self.ssh_opts = self.config.ssh_opts
         os.environ["ssh_opts"] = self.ssh_opts
@@ -82,6 +80,7 @@ class Base:
         for k, v in pbench_env.items():
             os.environ[k] = v
 
+    @abc.abstractmethod
     def execute(self):
         """Execute the required command"""
         pass
