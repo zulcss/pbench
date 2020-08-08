@@ -52,102 +52,13 @@ channel = "tool-meister-chan"
 REDIS_MAX_WAIT = 60
 
 
-def wait_for_subs(chan, expected_tms, logger):
-    """wait_for_subs - Wait for the data sink and the proper number of TMs to
-    register, and when they are all registered, return a dictionary of the
-    data sink and tool meister(s) pids.
-    """
-    pids = dict()
-    have_ds = False
-    num_tms = 0
-    for payload in chan:
-        try:
-            json_str = payload["data"].decode("utf-8")
-        except Exception:
-            logger.warning("data payload in message not UTF-8, '%r'", json_str)
-            continue
-        logger.debug('channel payload, "%r"', json_str)
-        try:
-            data = json.loads(json_str)
-        except json.JSONDecodeError:
-            logger.warning("data payload in message not JSON, '%s'", json_str)
-            continue
-        # We expect the payload to look like:
-        #   { "kind": "<ds|tm>",
-        #     "hostname": "<hostname>",
-        #     "pid": "<pid>"
-        #   }
-        # Where 'kind' is either 'ds' (data-sink) or 'tm' (tool-meister),
-        # 'hostname' is the host name on which that entity is running, and
-        # 'pid' is that entity's PID on that host.
-        try:
-            new_data = dict(
-                kind=data["kind"], hostname=data["hostname"], pid=data["pid"]
-            )
-        except KeyError:
-            logger.warning("unrecognized data payload in message, '%r'", data)
-            continue
-        else:
-            if new_data["kind"] == "ds":
-                pids["ds"] = new_data
-                have_ds = True
-            elif new_data["kind"] == "tm":
-                if "tm" not in pids:
-                    pids["tm"] = []
-                pids["tm"].append(new_data)
-                num_tms += 1
-            else:
-                logger.warning("unrecognized 'kind', in data payload '%r'", data)
-                continue
-        if have_ds and num_tms == expected_tms:
-            break
-    return pids
-
-
-def kill_redis_server(pid_file):
-    """kill_redis_server - given a redis server PID file, attempt to KILL the
-    Redis server.
-
-    Returns "1" if successfully KILL'd; "2" if it encounters an error reading
-    the PID file; "3" if bad PID value; "4" if the Redis server PID does not
-    exist; "5" if some kind of OSError is encountered; and "6" if some other
-    exception was encountered while KILL'ing it.
-    """
-    try:
-        with pid_file.open("r") as fp:
-            raw_pid = fp.read()
-    except Exception:
-        # No "pid" to kill
-        return 2
-    else:
-        try:
-            pid = int(raw_pid)
-        except Exception:
-            # Bad pid value
-            return 3
-        try:
-            os.kill(pid, signal.SIGKILL)
-        except OSError as exc:
-            if exc.errno == errno.ESRCH:
-                # PID not found, ignore
-                return 4
-            else:
-                # Some error encountered trying to KILL the process.
-                return 5
-        except Exception:
-            # Some other error encountered trying to KILL the process.
-            return 6
-        else:
-            # "successfully" KILL'd the give process.
-            return 1
-
-
 class Start(base.Base):
     """Main program for the tool meister start."""
 
     def execute(self):
         _prog = Path(sys.argv[0])
         _prog_dir = _prog.parent
+
         PROG = _prog.name
         logger = logging.getLogger(PROG)
         if os.environ.get("_PBENCH_TOOL_MEISTER_START_LOG_LEVEL") == "debug":
@@ -254,7 +165,7 @@ class Start(base.Base):
                 redis_port,
                 exc,
             )
-            return kill_redis_server(redis_pid)
+            return self.kill_redis_server(redis_pid)
         else:
             assert resp["type"] == "subscribe", f"bad type: f{resp!r}"
             assert resp["pattern"] is None, f"bad pattern: {resp!r}"
@@ -274,7 +185,7 @@ class Start(base.Base):
             logger.exception(
                 "failed to create tool data sink parameter key in redis server"
             )
-            return kill_redis_server(redis_pid)
+            return self.kill_redis_server(redis_pid)
         data_sink = "pbench-tool-data-sink"
         data_sink_path = _prog_dir / data_sink
         logger.debug("starting tool data sink")
@@ -289,14 +200,14 @@ class Start(base.Base):
             )
         except Exception:
             logger.exception("failed to create pbench data sink, daemonized")
-            return kill_redis_server(redis_pid)
+            return self.kill_redis_server(redis_pid)
         else:
             if retcode != 0:
                 logger.error(
                     "failed to create pbench data sink, daemonized; return code: %d",
                     retcode,
                 )
-                return kill_redis_server(redis_pid)
+                return self.kill_redis_server(redis_pid)
 
         # 4. Start all the local and remote tool meister processes
         #   - leave a PID file on each local/remote host
@@ -342,7 +253,7 @@ class Start(base.Base):
                 logger.exception(
                     "failed to create tool meister parameter key in redis server"
                 )
-                return kill_redis_server(redis_pid)
+                return self.kill_redis_server(redis_pid)
             if host == full_hostname:
                 logger.debug("starting localhost tool meister")
                 try:
@@ -388,7 +299,7 @@ class Start(base.Base):
                 successes += 1
 
         if failures > 0:
-            return kill_redis_server(redis_pid)
+            return self.kill_redis_server(redis_pid)
 
         # Wait for all the SSH pids to complete.
         for pid, host in ssh_pids:
@@ -438,7 +349,7 @@ class Start(base.Base):
                 logger.exception("Failed to publish terminate message")
             else:
                 logger.debug("publish() = %r", ret)
-            ret_val = kill_redis_server(redis_pid)
+            ret_val = self.kill_redis_server(redis_pid)
         elif successes > 0:
             # If any successes, then we need to wait for them to show up as
             # subscribers.
@@ -446,13 +357,13 @@ class Start(base.Base):
                 "waiting for all successfully spawned SSH processes"
                 " to show up as subscribers"
             )
-            pids = wait_for_subs(chan, successes, logger)
+            pids = self.wait_for_subs(chan, successes, logger)
             # Record our collected pids.
             try:
                 redis_server.set("tm-pids", json.dumps(pids, sort_keys=True))
             except Exception:
                 logger.exception("failed to set tool meister pids object")
-                ret_val = kill_redis_server(redis_pid)
+                ret_val = self.kill_redis_server(redis_pid)
             else:
                 ret_val = 0
         else:
@@ -460,8 +371,96 @@ class Start(base.Base):
                 "unable to successfully start any tool meisters,"
                 " but encountered no failures either: terminating"
             )
-            ret_val = kill_redis_server(redis_pid)
+            ret_val = self.kill_redis_server(redis_pid)
         return ret_val
+
+    def kill_redis_server(self, pid_file):
+        """kill_redis_server - given a redis server PID file, attempt to KILL the
+        Redis server.
+
+        Returns "1" if successfully KILL'd; "2" if it encounters an error reading
+        the PID file; "3" if bad PID value; "4" if the Redis server PID does not
+        exist; "5" if some kind of OSError is encountered; and "6" if some other
+        exception was encountered while KILL'ing it.
+        """
+        try:
+            with pid_file.open("r") as fp:
+                raw_pid = fp.read()
+        except Exception:
+            # No "pid" to kill
+            return 2
+        else:
+            try:
+                pid = int(raw_pid)
+            except Exception:
+                # Bad pid value
+                return 3
+            try:
+                os.kill(pid, signal.SIGKILL)
+            except OSError as exc:
+                if exc.errno == errno.ESRCH:
+                    # PID not found, ignore
+                    return 4
+                else:
+                    # Some error encountered trying to KILL the process.
+                    return 5
+            except Exception:
+                # Some other error encountered trying to KILL the process.
+                return 6
+            else:
+                # "successfully" KILL'd the give process.
+                return 1
+
+    def wait_for_subs(self, chan, expected_tms, logger):
+        """wait_for_subs - Wait for the data sink and the proper number of TMs to
+        register, and when they are all registered, return a dictionary of the
+        data sink and tool meister(s) pids.
+        """
+        pids = dict()
+        have_ds = False
+        num_tms = 0
+        for payload in chan:
+            try:
+                json_str = payload["data"].decode("utf-8")
+            except Exception:
+                logger.warning("data payload in message not UTF-8, '%r'", json_str)
+                continue
+            logger.debug('channel payload, "%r"', json_str)
+            try:
+                data = json.loads(json_str)
+            except json.JSONDecodeError:
+                logger.warning("data payload in message not JSON, '%s'", json_str)
+                continue
+            # We expect the payload to look like:
+            #   { "kind": "<ds|tm>",
+            #     "hostname": "<hostname>",
+            #     "pid": "<pid>"
+            #   }
+            # Where 'kind' is either 'ds' (data-sink) or 'tm' (tool-meister),
+            # 'hostname' is the host name on which that entity is running, and
+            # 'pid' is that entity's PID on that host.
+            try:
+                new_data = dict(
+                    kind=data["kind"], hostname=data["hostname"], pid=data["pid"]
+                )
+            except KeyError:
+                logger.warning("unrecognized data payload in message, '%r'", data)
+                continue
+            else:
+                if new_data["kind"] == "ds":
+                    pids["ds"] = new_data
+                    have_ds = True
+                elif new_data["kind"] == "tm":
+                    if "tm" not in pids:
+                        pids["tm"] = []
+                    pids["tm"].append(new_data)
+                    num_tms += 1
+                else:
+                    logger.warning("unrecognized 'kind', in data payload '%r'", data)
+                    continue
+            if have_ds and num_tms == expected_tms:
+                break
+        return pids
 
 
 def _group(f):
