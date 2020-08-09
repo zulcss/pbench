@@ -472,5 +472,5 @@ def _group(f):
 @options.common_options
 @_group
 @context.pass_cli_context
-def main(ctxt):
+def start(ctxt):
     Start(ctxt).execute()

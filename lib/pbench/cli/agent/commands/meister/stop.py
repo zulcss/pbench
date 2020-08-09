@@ -165,5 +165,5 @@ class Stop(base.Base):
 @click.command()
 @options.common_options
 @context.pass_cli_context
-def main(ctxt):
+def stop(ctxt):
     Stop(ctxt).execute()
