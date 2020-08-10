@@ -28,4 +28,4 @@ def main(ctxt):
 main.add_command(cleanup.cleanup)
 main.add_command(config.config)
 main.add_command(meister.meister)
-main.add_commnad(tools.tools)
+main.add_command(tools.tools)

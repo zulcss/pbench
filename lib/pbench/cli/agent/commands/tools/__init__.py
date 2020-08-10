@@ -2,6 +2,7 @@ import click
 
 from pbench.cli.agent import options
 from pbench.cli.agent.commands.tools import process
+from pbench.cli.agent.commands.tools import clear
 
 #
 # subgroup
@@ -17,3 +18,4 @@ tools.add_command(process.postprocess)
 tools.add_command(process.start)
 tools.add_command(process.stop)
 tools.add_command(process.kill)
+tools.add_command(clear.clear)
