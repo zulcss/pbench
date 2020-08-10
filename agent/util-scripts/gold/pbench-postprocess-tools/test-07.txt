@@ -1,8 +1,9 @@
 +++ Running test-07 pbench-postprocess-tools --group=foobar --dir=42-iter/sample42
+Unable to fetch and decode "tm-pids" key: Error 111 connecting to localhost:17001. Connection refused.
 --- Finished test-07 pbench-postprocess-tools (status=0)
 +++ pbench tree state
 /var/tmp/pbench-test-utils/pbench
-/var/tmp/pbench-test-utils/pbench/tmp
+/var/tmp/pbench-test-utils/pbench/pbench.log
 /var/tmp/pbench-test-utils/pbench/tools-v1-foobar
 /var/tmp/pbench-test-utils/pbench/tools-v1-foobar/testhost.example.com
 /var/tmp/pbench-test-utils/pbench/tools-v1-foobar/testhost.example.com/__label__
@@ -15,6 +16,6 @@ bar
 === /var/tmp/pbench-test-utils/pbench/tools-v1-foobar/testhost.example.com/iostat:
 --interval=10
 --- pbench tree state
-+++ test-execution.log file contents
-/var/tmp/pbench-test-utils/opt/pbench-agent/unittest-scripts/pbench-tool-meister-client foobar 42-iter/sample42 postprocess
---- test-execution.log file contents
++++ pbench.log file contents
+[1900-01-01T00:00:00][ERROR] Unable to fetch and decode "tm-pids" key: Error 111 connecting to localhost:17001. Connection refused.
+--- pbench.log file contents

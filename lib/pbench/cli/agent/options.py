@@ -10,7 +10,19 @@ from pbench.agent import PbenchAgentConfig
 def common_options(f):
     f = _pbench_agent_config(f)
     f = _pbench_agent_debug(f)
+    f = _pbench_redis_host(f)
     return f
+
+
+def _pbench_redis_host(f):
+    def callback(ctx, param, value):
+        clictx = ctx.ensure_object(context.CliContext)
+        clictx.redis_host = value
+        return value
+
+    return click.option(
+        "--redis-host", default="localhost", callback=callback, expose_value=False,
+    )(f)
 
 
 def _pbench_agent_config(f):

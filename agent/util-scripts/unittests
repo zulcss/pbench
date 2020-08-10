@@ -364,10 +364,10 @@ declare -A tools=(
     [test-50]="test-pbench-metadata-log"
     [test-51]="test-start-stop-tool-meister"
     [test-52]="test-start-stop-tool-meister"
-    [test-53]="test-client-tool-meister"
+    [test-53]="test-tool-meister"
     [test-54]="pbench-collect-sysinfo"
     [test-55]="pbench-collect-sysinfo"
-    [test-56]="test-client-tool-meister"
+    [test-56]="test-tool-meister"
 )
 
 declare -A options=(

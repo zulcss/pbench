@@ -1,4 +1,5 @@
 import logging
+import os
 
 import colorlog
 
@@ -40,7 +41,11 @@ def setup_logging(name=None, debug=False, logfile=None):
 
     # Setup log file
     if logfile is not None:
-        format_str = "[%(asctime)s.%(msecs)d][%(levelname)-1s] %(message)s"
+        if not os.environ.get("_PBENCH_UNIT_TESTS"):
+            format_str = "[%(asctime)s.%(msecs)d][%(levelname)-1s] %(message)s"
+        else:
+            format_str = "[1900-01-01T00:00:00][%(levelname)-1s] %(message)s"
+
         _formatter = logging.Formatter(format_str)
         log_file = logging.FileHandler(logfile)
         log_file.setLevel(logging.DEBUG)

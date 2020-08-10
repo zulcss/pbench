@@ -5,6 +5,7 @@ import pbr.version
 from pbench.cli.agent.commands import cleanup
 from pbench.cli.agent.commands import config
 from pbench.cli.agent.commands import meister
+from pbench.cli.agent.commands import tools
 
 click_completion.init()
 
@@ -27,3 +28,4 @@ def main(ctxt):
 main.add_command(cleanup.cleanup)
 main.add_command(config.config)
 main.add_command(meister.meister)
+main.add_commnad(tools.tools)

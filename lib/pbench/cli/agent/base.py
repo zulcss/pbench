@@ -77,6 +77,12 @@ class Base(metaclass=abc.ABCMeta):
             "date_suffix": self.date_suffix,
             "hostname": self.hostname,
             "full_hostname": self.full_hostname,
+            "pbench_run": str(self.pbench_run),
+            "pbench_install_dir": str(self.pbench_install_dir),
+            "pbench_tmp": str(self.pbench_tmp),
+            "pbench_log": str(self.pbench_log),
+            "pbench_bspp_dir": str(self.pbench_bspp_dir),
+            "pbench_lib_dir": str(self.pbench_lib_dir),
         }
         for k, v in pbench_env.items():
             os.environ[k] = v

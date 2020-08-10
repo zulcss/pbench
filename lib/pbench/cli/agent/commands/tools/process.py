@@ -5,24 +5,17 @@ operation can be one of "start", "stop", or "send".
 """
 
 import json
-import logging
+import inspect
 import os
-import sys
 
 import click
 import redis
 
+from pbench.agent.utils import setup_logging
 from pbench.cli.agent import base, context, options
-from pbench.agent.common import redis_port, channel
+from pbench.cli.agent.commands.tools import cli
+from pbench.agent.common import redis_port, channel, cl_channel
 
-# FIXME: move to common area
-redis_host = "localhost"
-
-
-# FIXME: this should be moved to a shared area
-cl_channel = "tool-meister-client"
-
-# List of allowed operations
 allowed_operations = ("start", "stop", "send", "postprocess", "kill")
 
 
@@ -32,16 +25,9 @@ def _group(f):
         clictx.group = value
         return value
 
-    return click.argument("group", expose_value=False, callback=callback)(f)
-
-
-def _operation(f):
-    def callback(ctx, param, value):
-        clictx = ctx.ensure_object(context.CliContext)
-        clictx.operation = value
-        return value
-
-    return click.argument("operation", expose_value=False, callback=callback)(f)
+    return click.option(
+        "-g", "--group", default="default", expose_value=False, callback=callback,
+    )(f)
 
 
 def _directory(f):
@@ -50,25 +36,24 @@ def _directory(f):
         clictx.directory = value
         return value
 
-    return click.argument("directory", expose_value=False, callback=callback)(f)
+    return click.option("-d", "--dir", expose_value=False, callback=callback)(f)
 
 
-class Client(base.Base):
+class Client(base.Base, cli.ToolCli):
     def execute(self):
         """Main program for the tool meister client."""
-        PROG = os.path.basename(sys.argv[0])
-        logger = logging.getLogger(PROG)
 
-        if os.environ.get("_PBENCH_TOOL_MEISTER_CLIENT_LOG_LEVEL") == "debug":
-            log_level = logging.DEBUG
-        else:
-            log_level = logging.INFO
-        logger.setLevel(log_level)
-        sh = logging.StreamHandler()
-        sh.setLevel(log_level)
-        shf = logging.Formatter("%(message)s")
-        sh.setFormatter(shf)
-        logger.addHandler(sh)
+        self.context.debug = (
+            True
+            if os.environ.get("_PBENCH_TOOL_MEISTER_CLIENT_LOG_LEVEL") == "debug"
+            else False
+        )
+        self.logger = setup_logging(debug=self.context.debug, logfile=self.pbench_log)
+
+        self.logger.debug("context: %s", vars(self.context))
+
+        if not self.tools_group_dir(self.context.group).exists():
+            return 1
 
         if self.context.operation not in allowed_operations:
             raise Exception(
@@ -84,39 +69,41 @@ class Client(base.Base):
             # properly shut down.
             return 0
 
-        logger.debug("constructing Redis() object")
+        self.logger.debug("constructing Redis() object")
         try:
-            redis_server = redis.Redis(host=redis_host, port=redis_port, db=0)
+            redis_server = redis.Redis(
+                host=self.context.redis_host, port=redis_port, db=0
+            )
         except Exception as e:
-            logger.error(
+            self.logger.error(
                 "Unable to connect to redis server, %s:%s: %s",
-                redis_host,
+                self.context.redis_host,
                 redis_port,
                 e,
             )
             return 2
         else:
-            logger.debug("constructed Redis() object")
+            self.logger.debug("constructed Redis() object")
 
-        logger.debug("Redis().get('tm-pids')")
+        self.logger.debug("Redis().get('tm-pids')")
         try:
             tm_pids_raw = redis_server.get("tm-pids")
             if tm_pids_raw is None:
-                logger.error('Tool Meister PIDs key, "tm-pids", does not exist.')
+                self.logger.error('Tool Meister PIDs key, "tm-pids", does not exist.')
                 return 3
             tm_pids_str = tm_pids_raw.decode("utf-8")
             tm_pids = json.loads(tm_pids_str)
         except Exception as ex:
-            logger.error('Unable to fetch and decode "tm-pids" key: %s', ex)
+            self.logger.error('Unable to fetch and decode "tm-pids" key: %s', ex)
             return 4
         else:
-            logger.debug("Redis().get('tm-pids') success")
+            self.logger.debug("Redis().get('tm-pids') success")
             expected_pids = 0
             tracking = {}
             try:
                 tracking["ds"] = tm_pids["ds"]
             except Exception:
-                logger.error("missing data sink in 'tm-pids', %r", tm_pids)
+                self.logger.error("missing data sink in 'tm-pids', %r", tm_pids)
                 return 5
             else:
                 expected_pids += 1
@@ -124,23 +111,23 @@ class Client(base.Base):
             try:
                 tms = tm_pids["tm"]
             except Exception:
-                logger.error("missing tool meisters in 'tm-pids', %r", tm_pids)
+                self.logger.error("missing tool meisters in 'tm-pids', %r", tm_pids)
                 return 6
             else:
                 expected_pids += len(tms)
                 for tm in tms:
                     tm["status"] = None
                     tracking[tm["hostname"]] = tm
-                logger.debug("tm_pids = %r", tm_pids)
+                self.logger.debug("tm_pids = %r", tm_pids)
 
         # First setup our client channel for receiving operation completion statuses.
-        logger.debug("pubsub")
+        self.logger.debug("pubsub")
         pubsub = redis_server.pubsub()
-        logger.debug("subscribe")
+        self.logger.debug("subscribe")
         pubsub.subscribe(cl_channel)
-        logger.debug("listen")
+        self.logger.debug("listen")
         client_chan = pubsub.listen()
-        logger.debug("next")
+        self.logger.debug("next")
         resp = next(client_chan)
         assert resp["type"] == "subscribe", f"Unexpected 'type': {resp!r}"
         assert resp["pattern"] is None, f"Unexpected 'pattern': {resp!r}"
@@ -148,7 +135,7 @@ class Client(base.Base):
             resp["channel"].decode("utf-8") == cl_channel
         ), f"Unexpected 'channel': {resp!r}"
         assert resp["data"] == 1, f"Unexpected 'data': {resp!r}"
-        logger.debug("next success")
+        self.logger.debug("next success")
 
         # The published message contains three pieces of information:
         #   {
@@ -158,7 +145,7 @@ class Client(base.Base):
         #   }
         # The caller of tool-meister-client must be sure the directory argument
         # is accessible by the tool-data-sink.
-        logger.debug("publish %s", channel)
+        self.logger.debug("publish %s", channel)
         msg = dict(
             state=self.context.operation,
             group=self.context.group,
@@ -167,12 +154,12 @@ class Client(base.Base):
         try:
             num_present = redis_server.publish(channel, json.dumps(msg))
         except Exception:
-            logger.exception("Failed to publish client message")
+            self.logger.exception("Failed to publish client message")
             ret_val = 1
         else:
-            logger.debug("published %s", channel)
+            self.logger.debug("published %s", channel)
             if num_present != expected_pids:
-                logger.error(
+                self.logger.error(
                     "Failed to publish to %d pids, only encountered %d on the channel",
                     expected_pids,
                     num_present,
@@ -190,20 +177,20 @@ class Client(base.Base):
         # (num_present will never be reached).
         done_count = 0
         while done_count < num_present:
-            logger.debug("next")
+            self.logger.debug("next")
             try:
                 resp = next(client_chan)
             except Exception:
-                logger.exception("Error encountered waiting for status reports")
+                self.logger.exception("Error encountered waiting for status reports")
                 ret_val = 1
                 break
             else:
-                logger.debug("next success")
+                self.logger.debug("next success")
             try:
                 json_str = resp["data"].decode("utf-8")
                 data = json.loads(json_str)
             except Exception:
-                logger.error("data payload in message not JSON, %r", json_str)
+                self.logger.error("data payload in message not JSON, %r", json_str)
                 ret_val = 1
             else:
                 try:
@@ -211,7 +198,7 @@ class Client(base.Base):
                     hostname = data["hostname"]
                     status = data["status"]
                 except Exception:
-                    logger.error("unrecognized status payload, %r", json_str)
+                    self.logger.error("unrecognized status payload, %r", json_str)
                     ret_val = 1
                 else:
                     if kind == "ds":
@@ -219,14 +206,14 @@ class Client(base.Base):
                         hostname = "ds"
                     else:
                         if hostname not in tracking:
-                            logger.warning(
+                            self.logger.warning(
                                 "encountered hostname not being tracked, %r", json_str
                             )
                             ret_val = 1
                             continue
                     tracking[hostname]["status"] = status
                     if status != "success":
-                        logger.warning(
+                        self.logger.warning(
                             "Host '%s' status message not successful: '%s'",
                             hostname,
                             status,
@@ -234,9 +221,9 @@ class Client(base.Base):
                         ret_val = 1
                     done_count += 1
 
-        logger.debug("unsubscribe")
+        self.logger.debug("unsubscribe")
         pubsub.unsubscribe()
-        logger.debug("pubsub close")
+        self.logger.debug("pubsub close")
         pubsub.close()
 
         return ret_val
@@ -246,7 +233,37 @@ class Client(base.Base):
 @options.common_options
 @_group
 @_directory
-@_operation
 @context.pass_cli_context
-def main(ctxt):
+def postprocess(ctxt):
+    ctxt.operation = inspect.stack()[0][3]
+    Client(ctxt).execute()
+
+
+@click.command()
+@options.common_options
+@_group
+@_directory
+@context.pass_cli_context
+def start(ctxt):
+    ctxt.operation = inspect.stack()[0][3]
+    Client(ctxt).execute()
+
+
+@click.command()
+@options.common_options
+@_group
+@_directory
+@context.pass_cli_context
+def stop(ctxt):
+    ctxt.operation = inspect.stack()[0][3]
+    Client(ctxt).execute()
+
+
+@click.command()
+@options.common_options
+@_group
+@_directory
+@context.pass_cli_context
+def kill(ctxt):
+    ctxt.operation = inspect.stack()[0][3]
     Client(ctxt).execute()

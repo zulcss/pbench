@@ -74,10 +74,19 @@ class Start(base.Base):
             return 1
 
         try:
-            benchmark_run_dir = os.environ["benchmark_run_dir"]
-            hostname = os.environ["hostname"]
-            full_hostname = os.environ["full_hostname"]
-        except Exception:
+            benchmark_run_dir = os.environ.get("benchmark_run_dir", None)
+            if not benchmark_run_dir:
+                raise Exception("benchmark run directory is not set")
+
+            hostname = os.environ.get("hostname", None)
+            if not hostname:
+                raise Exception("hostname is not set")
+
+            full_hostname = os.environ.get("full_hostname", None)
+            if not full_hostname:
+                raise Exception("Full hostname is not set")
+
+        except (Exception):
             logger.exception("failed to fetch parameters from the environment")
             return 1
         else:
