@@ -45,7 +45,7 @@ import daemon
 import pidfile
 import redis
 
-from pbench.agent.tools import Terminate, ToolMeister
+from pbench.agent.meister import Terminate, ToolMeister
 from pbench.cli.agent import base, context, options
 
 
