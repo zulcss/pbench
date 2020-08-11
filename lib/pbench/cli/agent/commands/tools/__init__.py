@@ -3,6 +3,7 @@ import click
 from pbench.cli.agent import options
 from pbench.cli.agent.commands.tools import process
 from pbench.cli.agent.commands.tools import clear
+from pbench.cli.agent.commands.tools import list
 
 #
 # subgroup
@@ -19,3 +20,4 @@ tools.add_command(process.start)
 tools.add_command(process.stop)
 tools.add_command(process.kill)
 tools.add_command(clear.clear)
+tools.add_command(list.list)

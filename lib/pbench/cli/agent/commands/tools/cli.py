@@ -13,13 +13,10 @@ class ToolCli:
         """
         return Path(self.pbench_run, f"tools-v1-{group}")
 
-    def tools(self, group, remote):
-        tools_dir = Path(self.tools_group_dir(group), remote)
-        if not tools_dir.exists():
-            raise Error("%s does not exist", tools_dir)
+    def tools(self, path):
         return [
             p.name
-            for p in tools_dir.glob("*")
+            for p in path.iterdir()
             if p.name != "__label__" and p.suffix != ".__noinstall__"
         ]
 
@@ -91,3 +88,33 @@ class ToolCli:
                             raise Error("Failed to remote %s", tg_r)
                             if self.context.debug:
                                 self.logger.exception(ex)
+
+    def list_tools(self):
+        """List registered tools"""
+        self.logger.debug("in list_tools")
+
+        if not self.context.group:
+            self.context.group = self.groups
+
+        if self.context.name:
+            groups = []
+            for group in self.context.group:
+                for path in self.tools_group_dir(group).iterdir():
+                    if path.name == "__trigger__":
+                        continue
+                    if any(path.iterdir()):
+                        if self.context.name in self.tools(path):
+                            if group not in groups:
+                                groups.append(group)
+            if groups:
+                print(
+                    "tool name: %s groups: %s" % (self.context.name, ", ".join(groups))
+                )
+        else:
+            dirs = {}
+            for group in self.context.group:
+                dirs[group] = {}
+                for path in self.tools_group_dir(group).glob("*/**"):
+                    dirs[group][path.name] = self.tools(path)
+            for k, v in dirs.items():
+                print("%s: " % k, ", ".join("{} {}".format(h, t) for h, t in v.items()))
