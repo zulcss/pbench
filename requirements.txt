@@ -16,3 +16,5 @@ pbr
 click_completion
 colorlog
 colorama
+numpy
+
