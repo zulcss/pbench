@@ -2,7 +2,7 @@ import os
 import datetime
 import responses
 
-from pbench.cli.agent.commands.results import move_results
+from pbench.cli.agent.commands.results.move import move_results
 from pbench.test.unit.agent.task.common import MockDatetime
 
 

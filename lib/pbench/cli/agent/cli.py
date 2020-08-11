@@ -7,6 +7,7 @@ from pbench.cli.agent.commands import config
 from pbench.cli.agent.commands import meister
 from pbench.cli.agent.commands import tools
 from pbench.cli.agent.commands import triggers
+from pbench.cli.agent.commands import results
 
 click_completion.init()
 
@@ -31,3 +32,4 @@ main.add_command(config.config)
 main.add_command(meister.meister)
 main.add_command(tools.tools)
 main.add_command(triggers.triggers)
+main.add_command(results.results)
