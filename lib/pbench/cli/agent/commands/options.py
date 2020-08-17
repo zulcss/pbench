@@ -1,6 +1,6 @@
 import click
 
-from pbench.cli.agent import context
+from pbench.agent import context
 from pbench.agent import PbenchAgentConfig
 
 
