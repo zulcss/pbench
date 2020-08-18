@@ -2,7 +2,7 @@ import click
 import click_completion
 import pbr.version
 
-from pbench.cli.agent.commands import tools
+from pbench.cli.agent.commands import tools, triggers
 
 click_completion.init()
 
@@ -23,3 +23,4 @@ def main(ctxt):
 
 
 main.add_command(tools.tools)
+main.add_command(triggers.triggers)

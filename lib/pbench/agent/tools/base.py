@@ -1,5 +1,3 @@
-from pathlib import Path
-
 from pbench.agent import base
 from pbench.agent.tools.clear import ClearMixin
 from pbench.agent.tools.list import ListMixin
@@ -14,9 +12,6 @@ class ToolBase(base.Base, ClearMixin, ListMixin, RegisterMixin):
 
     def execute(self):
         pass
-
-    def tools_group_dir(self, group):
-        return Path(self.pbench_run, f"tools-v1-{group}")
 
     @property
     def remotes(self):

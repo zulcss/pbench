@@ -94,6 +94,9 @@ class Base:
 
         self.logger = setup_logging(logfile=self.pbench_log)
 
+    def tools_group_dir(self, group):
+        return Path(self.pbench_run, f"tools-v1-{group}")
+
     def execute(self):
         """Execute the required command"""
         pass
