@@ -2,9 +2,10 @@ from pathlib import Path
 
 from pbench.agent import base
 from pbench.agent.tools.clear import ClearMixin
+from pbench.agent.tools.list import ListMixin
 
 
-class ToolBase(base.Base, ClearMixin):
+class ToolBase(base.Base, ClearMixin, ListMixin):
     def __init__(self, context):
         super(ToolBase, self).__init__(context)
 
@@ -33,4 +34,11 @@ class ToolBase(base.Base, ClearMixin):
             p.name
             for p in dir.iterdir()
             if p.name != "__label__" and p.suffix != ".__noinstall__"
+        ]
+
+    @property
+    def groups(self):
+        return [
+            path.name.split("tools-v1-")[1]
+            for path in self.pbench_run.glob("tools-v1-*")
         ]
