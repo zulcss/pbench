@@ -11,26 +11,27 @@
 #   sudo dnf install python3-bottle python3-daemon
 #   sudo pip3 install python-pidfile
 
-import sys
+import errno
+import hashlib
+import json
+import logging
 import os
+import shutil
 import socket
 import subprocess
-import shutil
-import json
-import hashlib
+import sys
 import tempfile
-import logging
+from distutils.spawn import find_executable
+from http import HTTPStatus
+from pathlib import Path
+from threading import Condition, Lock, Thread
+from wsgiref.simple_server import WSGIRequestHandler, make_server
+
+import click
 import daemon
 import pidfile
 import redis
-import errno
-from pathlib import Path
-from distutils.spawn import find_executable
-from threading import Thread, Lock, Condition
-from http import HTTPStatus
-from wsgiref.simple_server import WSGIRequestHandler, make_server
-from bottle import Bottle, ServerAdapter, request, abort
-
+from bottle import Bottle, ServerAdapter, abort, request
 
 # Read in 64 KB chunks off the wire for HTTP PUT requests.
 _BUFFER_SIZE = 65536
@@ -455,7 +456,7 @@ class ToolDataSink(Bottle):
 
         done = False
         while not done:
-            for hostname, tm in self._tm_tracking.items():
+            for _, tm in self._tm_tracking.items():
                 if tm["posted"] is None:
                     continue
                 if tm["posted"] == "waiting":
@@ -484,7 +485,7 @@ class ToolDataSink(Bottle):
         """
         if self._tm_tracking is None:
             return
-        for hostname, tm in self._tm_tracking.items():
+        for _, tm in self._tm_tracking.items():
             if tm["posted"] is None:
                 continue
             assert (
@@ -778,8 +779,12 @@ class ToolDataSink(Bottle):
             self._cv.notify()
 
 
-def main(argv):
-    PROG = Path(argv[0]).name
+@click.command()
+@click.argument("redis_host", required=True)
+@click.argument("redis_port", required=True)
+@click.argument("param_key", required=True)
+def main(redis_host, redis_port, param_key):
+    PROG = Path(sys.argv[0]).name
 
     logger = logging.getLogger(PROG)
     fh = logging.FileHandler(f"{PROG}.log")
@@ -799,14 +804,6 @@ def main(argv):
     fh.setLevel(log_level)
     logger.addHandler(fh)
     logger.setLevel(log_level)
-
-    try:
-        redis_host = argv[1]
-        redis_port = argv[2]
-        param_key = argv[3]
-    except IndexError as e:
-        logger.error("Invalid arguments: %s", e)
-        return 1
 
     global tar_path
     tar_path = find_executable("tar")
@@ -908,5 +905,5 @@ def main(argv):
 
 
 if __name__ == "__main__":
-    status = main(sys.argv)
+    status = main()
     sys.exit(status)

@@ -7,12 +7,13 @@ Responsible for publishing the requested tool meister operation.  The
 operation can be one of "start", "stop", or "send".
 """
 
-import sys
-import os
 import json
 import logging
-import redis
+import os
+import sys
 
+import click
+import redis
 
 # FIXME: move to common area
 redis_host = "localhost"
@@ -27,10 +28,14 @@ cl_channel = "tool-meister-client"
 allowed_operations = ("end", "init", "send", "start", "stop", "kill")
 
 
-def main(argv):
+@click.command()
+@click.argument("group", required=True)
+@click.argument("directory", required=True)
+@click.argument("operation", required=True)
+def main(group, directory, operation):
     """Main program for the tool meister client.
     """
-    PROG = os.path.basename(argv[0])
+    PROG = os.path.basename(sys.argv[0])
     logger = logging.getLogger(PROG)
 
     if os.environ.get("_PBENCH_TOOL_MEISTER_CLIENT_LOG_LEVEL") == "debug":
@@ -44,29 +49,16 @@ def main(argv):
     sh.setFormatter(shf)
     logger.addHandler(sh)
 
-    try:
-        group = argv[1]
-    except IndexError:
-        raise Exception("Missing group argument")
-    try:
-        directory = argv[2]
-    except IndexError:
-        raise Exception("Missing directory argument")
-    try:
-        operation = argv[3]
-    except IndexError:
-        raise Exception("Missing operation argument")
-    else:
-        if operation not in allowed_operations:
-            raise Exception(
-                "Unrecognized operation, '{}', allowed operations are:"
-                " {}".format(operation, allowed_operations)
-            )
-        elif operation == "kill":
-            # FIXME: we need to implement the gritty method of killing all the
-            # tool meisters, locally and remotely, and ensuring they are all
-            # properly shut down.
-            return 0
+    if operation not in allowed_operations:
+        raise Exception(
+            "Unrecognized operation, '{}', allowed operations are:"
+            " {}".format(operation, allowed_operations)
+        )
+    elif operation == "kill":
+        # FIXME: we need to implement the gritty method of killing all the
+        # tool meisters, locally and remotely, and ensuring they are all
+        # properly shut down.
+        return 0
 
     logger.debug("constructing Redis() object")
     try:
@@ -220,5 +212,5 @@ def main(argv):
 
 
 if __name__ == "__main__":
-    status = main(sys.argv)
+    status = main()
     sys.exit(status)

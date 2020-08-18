@@ -17,17 +17,18 @@ The pbench-tool-meister-stop script will take care of (gracefully) stopping
 all of these processes, locally or remotely.
 """
 
-import sys
+import errno
 import json
+import logging
 import os
 import signal
+import sys
 import time
-import errno
-import redis
-import logging
 from distutils.spawn import find_executable
 from pathlib import Path
 
+import click
+import redis
 
 # Port number is "One Tool" in hex 0x17001
 # FIXME: move to common area
@@ -221,10 +222,12 @@ def kill_redis_server(pid_file):
             return 1
 
 
-def main(argv):
+@click.command()
+@click.argument("group", default="default", required=True)
+def main(group):
     """Main program for the tool meister start.
     """
-    _prog = Path(argv[0])
+    _prog = Path(sys.argv[0])
     _prog_dir = _prog.parent
     PROG = _prog.name
     logger = logging.getLogger(PROG)
@@ -238,11 +241,6 @@ def main(argv):
     shf = logging.Formatter("%(message)s")
     sh.setFormatter(shf)
     logger.addHandler(sh)
-
-    try:
-        group = argv[1]
-    except IndexError:
-        group = "default"
 
     # 1. Load the tool group data given the tool group argument
     try:
@@ -538,5 +536,5 @@ def main(argv):
 
 
 if __name__ == "__main__":
-    status = main(sys.argv)
+    status = main()
     sys.exit(status)

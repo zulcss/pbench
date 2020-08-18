@@ -38,26 +38,27 @@ $ sudo pip3 install python-daemon
 $ sudo pip3 install python-pidfile
 """
 
-import sys
-import os
-import time
-import json
 import errno
+import hashlib
+import json
 import logging
-import tempfile
+import os
+import shutil
 import subprocess
+import sys
+import tempfile
+import time
+from distutils.spawn import find_executable
+from pathlib import Path
+
+import click
 import daemon
 import pidfile
 import redis
-import shutil
 import requests
 import requests.exceptions
-import hashlib
 
-from distutils.spawn import find_executable
-from pathlib import Path
 from pbench.server.utils import md5sum
-
 
 # Path to external tar executable.
 tar_path = None
@@ -1023,7 +1024,11 @@ class ToolMeister(object):
         return failures
 
 
-def main(argv):
+@click.command()
+@click.argument("redis_host", required=True)
+@click.argument("redis_port", required=True)
+@click.argument("param_key", required=True)
+def main(redis_host, redis_port, param_key):
     """Main program for the Tool Meister.
 
     This function is the simple driver for the tool meister behaviors,
@@ -1036,16 +1041,8 @@ def main(argv):
     Returns 0 on success, > 0 when an error occurs.
 
     """
-    PROG = os.path.basename(argv[0])
-    pbench_bin = os.path.dirname(os.path.dirname(argv[0]))
-
-    try:
-        redis_host = argv[1]
-        redis_port = argv[2]
-        param_key = argv[3]
-    except IndexError as e:
-        print(f"Invalid arguments: {e}", file=sys.stderr)
-        return 1
+    PROG = os.path.basename(sys.argv[0])
+    pbench_bin = os.path.dirname(os.path.dirname(sys.argv[0]))
 
     global tar_path
     tar_path = find_executable("tar")
@@ -1183,5 +1180,5 @@ def main(argv):
 
 
 if __name__ == "__main__":
-    status = main(sys.argv)
+    status = main()
     sys.exit(status)
