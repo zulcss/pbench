@@ -3,9 +3,10 @@ from pathlib import Path
 from pbench.agent import base
 from pbench.agent.tools.clear import ClearMixin
 from pbench.agent.tools.list import ListMixin
+from pbench.agent.tools.register import RegisterMixin
 
 
-class ToolBase(base.Base, ClearMixin, ListMixin):
+class ToolBase(base.Base, ClearMixin, ListMixin, RegisterMixin):
     def __init__(self, context):
         super(ToolBase, self).__init__(context)
 

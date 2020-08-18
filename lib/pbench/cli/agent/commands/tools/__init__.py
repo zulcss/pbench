@@ -1,7 +1,7 @@
 import click
 
 from pbench.cli.agent.commands import options
-from pbench.cli.agent.commands.tools import clear, list
+from pbench.cli.agent.commands.tools import clear, list, register
 
 #
 # subgroup
@@ -15,3 +15,4 @@ def tools(ctxt):
 
 tools.add_command(clear.clear)
 tools.add_command(list.list)
+tools.add_command(register.register)
