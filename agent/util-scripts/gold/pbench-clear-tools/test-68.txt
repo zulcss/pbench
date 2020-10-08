@@ -1,5 +1,6 @@
 +++ Running test-68 pbench-clear-tools --name=vmstat --remotes=fubar5.example.com,fubar6.example.com
 Removed "vmstat" from host, "fubar5.example.com", in tools group, "default"
+Tool vmstat not registered for remote fubar6.example.com
 --- Finished test-68 pbench-clear-tools (status=0)
 +++ pbench tree state
 /var/tmp/pbench-test-utils/pbench
@@ -23,6 +24,6 @@ Removed "vmstat" from host, "fubar5.example.com", in tools group, "default"
 --interval: 42
 --- pbench tree state
 +++ pbench.log file contents
-[info][1900-01-01T00:00:00.000000] Removed "vmstat" from host, "fubar5.example.com", in tools group, "default"
-[debug][1900-01-01T00:00:00.000000] Tool "vmstat" not registered for remote "fubar6.example.com"
+[INFO][1900-01-01T00:00:00.000000] Removed "vmstat" from host, "fubar5.example.com", in tools group, "default"
+[DEBUG][1900-01-01T00:00:00.000000] Tool vmstat not registered for remote fubar6.example.com
 --- pbench.log file contents

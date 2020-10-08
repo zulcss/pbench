@@ -1,8 +1,6 @@
 import logging
 import os
 
-import colorlog
-
 
 def setup_logging(name=None, debug=False, logfile=None):
     """Setup logging for client
@@ -18,21 +16,14 @@ def setup_logging(name=None, debug=False, logfile=None):
     # Make sh logging a bit less verbose
     logging.getLogger("sh").setLevel(logging.WARNING)
 
-    # FIXME: since we dont do debugging level yet
-    log.setLevel(logging.INFO)
+    # FIXME: since we dont do debugging level yet via the CLI
+    log.setLevel(logging.DEBUG)
 
     format_str = "%(message)s"
     date_format = "%Y-%m-%d %H:%M:%S"
-    cformat = "%(log_color)s" + format_str
-    colors = {
-        "DEBUG": "green",
-        "INFO": "cyan",
-        "WARNING": "bold_yellow",
-        "ERROR": "bold_red",
-        "CRITICAL": "bold_purple",
-    }
+
     # Setup console
-    formatter = colorlog.ColoredFormatter(cformat, date_format, log_colors=colors)
+    formatter = logging.Formatter(format_str, date_format)
     stream_handler = logging.StreamHandler()
     stream_handler.setFormatter(formatter)
 
