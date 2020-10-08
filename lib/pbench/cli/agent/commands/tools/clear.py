@@ -129,7 +129,6 @@ def _group_option(f):
         "-g",
         "--group",
         default="default",
-        required=True,
         expose_value=False,
         callback=callback,
         help="list the tools used in this <group-name>",
