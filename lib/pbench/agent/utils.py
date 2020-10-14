@@ -1,5 +1,6 @@
 import logging
 import os
+import socket
 
 
 def setup_logging(name=None, debug=False, logfile=None):
@@ -43,3 +44,12 @@ def setup_logging(name=None, debug=False, logfile=None):
     log.addHandler(stream_handler)
 
     return log
+
+
+def get_ips():
+    """Fetch local ip addresses"""
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.connect(("8.8.8.8", 80))
+    s.close()
+
+    return s.getsockname()[0]

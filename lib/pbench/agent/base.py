@@ -114,3 +114,6 @@ class BaseCommand(metaclass=abc.ABCMeta):
             click.echo(ctxt.get_help())
             return 1
         return 0
+
+    def gen_tools_group_dir(self, group):
+        return self.pbench_run / f"tools-v1-{group}"
